@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>BioFloraFauna — Tutor & Ensiklopedia Biologi Interaktif</title>
+
+  <!-- Google Fonts: Fraunces (Heading Organik) & Plus Jakarta Sans (Isi Modern) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Marked & DOMPurify untuk render Markdown yang aman & rapi -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+
+  <style>
+    :root {
+      /* Palet Alam: Hijau Hutan Tua, Sage, Krem Natural & Aksen Amber/Tanah */
+      --forest-950: #0c2218;
+      --forest-900: #1b4332;
+      --forest-800: #24563f;
+      --forest-700: #2d6a4f;
+      --sage-500: #52b788;
+      --sage-300: #95d5b2;
+      --sage-100: #e6f4ea;
+      --sage-50: #f2f9f4;
+
+      --cream-50: #fcfaf5;
+      --cream-100: #f6f1e7;
+      --cream-200: #eae2d3;
+      --earth-700: #7c4d25;
+      --amber-600: #b45309;
+      --amber-500: #d97706;
+      --amber-100: #fef3c7;
+
+      --text-main: #1a2e22;
+      --text-muted: #52665a;
+      --border-soft: #dfd7c8;
+      --danger-bg: #fef2f2;
+      --danger-border: #fecaca;
+      --danger-text: #991b1b;
+
+      --shadow-sm: 0 2px 8px rgba(27, 67, 50, 0.06);
+      --shadow-md: 0 8px 24px rgba(27, 67, 50, 0.10);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --sidebar-w: 296px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--cream-50);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Motif Latar Botani Halus */
+    .app-shell {
+      display: flex;
+      height: 100dvh;
+      width: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 92% 8%, rgba(82, 183, 136, 0.10) 0%, transparent 32%),
+        radial-gradient(circle at 12% 90%, rgba(217, 119, 6, 0.07) 0%, transparent 30%),
+        var(--cream-50);
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, var(--forest-900) 0%, var(--forest-950) 100%);
+      color: #f4f7f5;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 40;
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--sage-500), var(--forest-700));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+      line-height: 1.1;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--sage-300);
+      margin-top: 2px;
+    }
+
+    .close-sidebar-btn {
+      display: none;
+      background: rgba(255, 255, 255, 0.10);
+      border: none;
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-actions {
+      padding: 14px 16px 8px;
+    }
+
+    .btn-new-chat {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid rgba(149, 213, 178, 0.35);
+      background: rgba(82, 183, 136, 0.16);
+      color: #ffffff;
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-new-chat:hover {
+      background: rgba(82, 183, 136, 0.28);
+    }
+
+    .btn-new-chat:active {
+      transform: scale(0.98);
+    }
+
+    .sidebar-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 14px 16px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .sidebar-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+    }
+
+    .sidebar-section-label {
+      font-size: 0.70rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--sage-300);
+      font-weight: 700;
+      margin: 14px 6px 8px;
+    }
+
+    .topic-group-btn {
+      width: 100%;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: #eaf4ee;
+      padding: 10px 12px;
+      border-radius: 11px;
+      margin-bottom: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      transition: background 0.18s, border-color 0.18s;
+    }
+
+    .topic-group-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(149, 213, 178, 0.35);
+    }
+
+    .topic-emoji {
+      font-size: 1.1rem;
+      line-height: 1.2;
+      flex-shrink: 0;
+    }
+
+    .topic-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      display: block;
+    }
+
+    .topic-desc {
+      font-size: 0.72rem;
+      color: rgba(234, 244, 238, 0.70);
+      display: block;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+
+    .sidebar-footer {
+      padding: 12px 14px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.10);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .model-badge-box {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 0.74rem;
+      color: #d8f3dc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--sage-500);
+      box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.25);
+      flex-shrink: 0;
+    }
+
+    .status-dot.fallback {
+      background: var(--amber-500);
+      box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.25);
+    }
+
+    .btn-settings {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      color: #ffffff;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: background 0.18s;
+    }
+
+    .btn-settings:hover {
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    /* Overlay Mobile Sidebar */
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 34, 24, 0.55);
+      backdrop-filter: blur(2px);
+      z-index: 35;
+    }
+
+    .sidebar-backdrop.open {
+      display: block;
+    }
+
+    /* ================= MAIN CHAT AREA ================= */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      height: 100dvh;
+      position: relative;
+    }
+
+    /* Top Bar */
+    .topbar {
+      background: rgba(252, 250, 245, 0.90);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-soft);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 15;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .menu-btn {
+      display: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: #fff;
+      color: var(--forest-900);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .topbar-title-group {
+      min-width: 0;
+    }
+
+    .topbar-title {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--forest-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-subtitle {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* Mode Belajar Segmented Control */
+    .mode-selector {
+      display: inline-flex;
+      background: var(--cream-100);
+      border: 1px solid var(--border-soft);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .mode-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 6px 11px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .mode-btn.active {
+      background: var(--forest-900);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(27, 67, 50, 0.20);
+    }
+
+    .icon-action-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--forest-900);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .icon-action-btn:hover {
+      background: var(--cream-100);
+    }
+
+    /* Mobile Mode Bar (ditampilkan di layar kecil agar topbar tidak penuh) */
+    .mobile-mode-bar {
+      display: none;
+      padding: 8px 14px;
+      background: var(--cream-100);
+      border-bottom: 1px solid var(--border-soft);
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .mobile-mode-label {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--forest-900);
+    }
+
+    /* ================= CHAT MESSAGES ================= */
+    .chat-viewport {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 18px 16px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-container {
+      max-width: 840px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* Welcome Hero Card */
+    .welcome-card {
+      background: #ffffff;
+      border: 1px solid var(--border-soft);
+      border-radius: 22px;
+      padding: 26px 24px;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-deco {
+      position: absolute;
+      right: -14px;
+      top: -14px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .welcome-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--sage-100);
+      color: var(--forest-800);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 999px;
+      margin-bottom: 12px;
+    }
+
+    .welcome-card h1 {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+      color: var(--forest-900);
+      margin-bottom: 8px;
+      line-height: 1.25;
+    }
+
+    .welcome-card p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 660px;
+      margin-bottom: 18px;
+    }
+
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pillar-item {
+      background: var(--cream-50);
+      border: 1px solid var(--border-soft);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 0.80rem;
+    }
+
+    .pillar-item strong {
+      display: block;
+      color: var(--forest-900);
+      margin-bottom: 3px;
+    }
+
+    .pillar-item span {
+      color: var(--text-muted);
+      line-height: 1.35;
+      display: block;
+    }
+
+    .quick-chips-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .quick-chip {
+      min-height: 38px;
+      border: 1px solid #c9decb;
+      background: var(--sage-50);
+      color: var(--forest-900);
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.18s;
+    }
+
+    .quick-chip:hover {
+      background: var(--forest-900);
+      color: #ffffff;
+      border-color: var(--forest-900);
+      transform: translateY(-1px);
+    }
+
+    /* Message Bubbles */
+    .msg-row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      animation: fadeUp 0.22s ease-out;
+    }
+
+    .msg-row.user {
+      flex-direction: row-reverse;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+      margin-top: 2px;
+    }
+
+    .msg-row.assistant .msg-avatar {
+      background: linear-gradient(135deg, var(--forest-800), var(--forest-900));
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(27, 67, 50, 0.18);
+    }
+
+    .msg-row.user .msg-avatar {
+      background: var(--amber-100);
+      color: var(--earth-700);
+      border: 1px solid #f3d69b;
+    }
+
+    .msg-content-col {
+      max-width: min(720px, 86%);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+
+    .msg-row.user .msg-content-col {
+      align-items: flex-end;
+    }
+
+    .msg-bubble {
+      padding: 13px 16px;
+      border-radius: 18px;
+      font-size: 0.93rem;
+      line-height: 1.65;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .msg-row.user .msg-bubble {
+      background: linear-gradient(135deg, var(--forest-800), var(--forest-900));
+      color: #ffffff;
+      border-bottom-right-radius: 5px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .msg-row.assistant .msg-bubble {
+      background: #ffffff;
+      color: var(--text-main);
+      border: 1px solid var(--border-soft);
+      border-bottom-left-radius: 5px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Markdown Formatting inside Assistant Bubble */
+    .markdown-body h1, .markdown-body h2, .markdown-body h3, .markdown-body h4 {
+      font-family: 'Fraunces', serif;
+      color: var(--forest-900);
+      margin: 14px 0 6px;
+      line-height: 1.3;
+    }
+
+    .markdown-body h1:first-child,
+    .markdown-body h2:first-child,
+    .markdown-body h3:first-child {
+      margin-top: 2px;
+    }
+
+    .markdown-body h2 { font-size: 1.12rem; }
+    .markdown-body h3 { font-size: 1.0rem; }
+
+    .markdown-body p {
+      margin-bottom: 10px;
+    }
+
+    .markdown-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    .markdown-body ul, .markdown-body ol {
+      padding-left: 20px;
+      margin: 6px 0 12px;
+    }
+
+    .markdown-body li {
+      margin-bottom: 5px;
+    }
+
+    .markdown-body strong {
+      color: var(--forest-900);
+      font-weight: 700;
+    }
+
+    .markdown-body em {
+      color: var(--earth-700);
+      font-style: italic;
+    }
+
+    .markdown-body blockquote {
+      border-left: 3px solid var(--sage-500);
+      background: var(--sage-50);
+      padding: 9px 13px;
+      border-radius: 0 10px 10px 0;
+      margin: 10px 0;
+      color: var(--forest-900);
+      font-size: 0.90rem;
+    }
+
+    .markdown-body code {
+      background: var(--cream-100);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.85em;
+      color: var(--earth-700);
+    }
+
+    .markdown-body pre {
+      background: var(--forest-950);
+      color: #e9f5ee;
+      padding: 12px;
+      border-radius: 10px;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    .markdown-body pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 420px;
+    }
+
+    .markdown-body th {
+      background: var(--forest-900);
+      color: #ffffff;
+      text-align: left;
+      padding: 9px 12px;
+      font-weight: 600;
+    }
+
+    .markdown-body td {
+      padding: 8px 12px;
+      border-top: 1px solid var(--border-soft);
+      vertical-align: top;
+    }
+
+    .markdown-body tr:nth-child(even) td {
+      background: var(--cream-50);
+    }
+
+    .msg-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 4px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .copy-btn {
+      border: 1px solid var(--border-soft);
+      background: #fff;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 999px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--forest-700);
+      color: var(--forest-900);
+    }
+
+    .fallback-pill {
+      background: var(--amber-100);
+      color: var(--amber-600);
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    /* Thinking Indicator */
+    .thinking-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--forest-800);
+      font-size: 0.86rem;
+      font-weight: 500;
+    }
+
+    .leaf-dots {
+      display: inline-flex;
+      gap: 4px;
+    }
+
+    .leaf-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--sage-500);
+      animation: bounceLeaf 1.2s infinite ease-in-out;
+    }
+
+    .leaf-dots span:nth-child(2) { animation-delay: 0.18s; }
+    .leaf-dots span:nth-child(3) { animation-delay: 0.36s; }
+
+    @keyframes bounceLeaf {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.45; }
+      40% { transform: scale(1.1); opacity: 1; }
+    }
+
+    /* Error Card */
+    .error-card {
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
+      color: var(--danger-text);
+      border-radius: 14px;
+      padding: 13px 15px;
+      font-size: 0.86rem;
+      line-height: 1.5;
+    }
+
+    .error-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-err {
+      min-height: 36px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #fca5a5;
+      background: #fff;
+      color: var(--danger-text);
+      font-weight: 600;
+      font-size: 0.78rem;
+      cursor: pointer;
+    }
+
+    .btn-err:hover {
+      background: #fee2e2;
+    }
+
+    /* ================= COMPOSER / INPUT AREA ================= */
+    .composer-shell {
+      background: rgba(252, 250, 245, 0.94);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid var(--border-soft);
+      padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+    }
+
+    .composer-inner {
+      max-width: 840px;
+      margin: 0 auto;
+    }
+
+    /* Strip Quick Chips di atas kolom ketik */
+    .quick-strip {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      padding-bottom: 9px;
+      scrollbar-width: none;
+    }
+
+    .quick-strip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .strip-chip {
+      flex-shrink: 0;
+      border: 1px solid var(--border-soft);
+      background: #ffffff;
+      color: var(--forest-900);
+      font-size: 0.77rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.16s;
+      white-space: nowrap;
+    }
+
+    .strip-chip:hover {
+      background: var(--sage-100);
+      border-color: var(--sage-500);
+    }
+
+    .input-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-soft);
+      border-radius: 18px;
+      padding: 8px 10px 8px 15px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-box:focus-within {
+      border-color: var(--forest-700);
+      box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
+    }
+
+    #chatInput {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      font-family: inherit;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      max-height: 140px;
+      min-height: 26px;
+      padding: 5px 0;
+      background: transparent;
+      color: var(--text-main);
+    }
+
+    #chatInput::placeholder {
+      color: #88988e;
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
+      border: none;
+      background: var(--forest-900);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.18s, transform 0.15s;
+    }
+
+    .send-btn:hover:not(:disabled) {
+      background: var(--forest-700);
+    }
+
+    .send-btn:active:not(:disabled) {
+      transform: scale(0.95);
+    }
+
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .send-btn.stop-mode {
+      background: var(--amber-600);
+    }
+
+    .composer-hint {
+      font-size: 0.71rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 6px;
+    }
+
+    /* ================= SETTINGS MODAL ================= */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 34, 24, 0.55);
+      backdrop-filter: blur(3px);
+      z-index: 60;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 460px;
+      border-radius: 20px;
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-md);
+      padding: 22px;
+      animation: fadeUp 0.2s ease-out;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .modal-header h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 1.2rem;
+      color: var(--forest-900);
+    }
+
+    .modal-close {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid var(--border-soft);
+      background: var(--cream-50);
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: var(--text-main);
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--forest-900);
+      margin-bottom: 6px;
+    }
+
+    .api-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .api-input {
+      flex: 1;
+      min-height: 42px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border-soft);
+      font-family: monospace;
+      font-size: 0.83rem;
+      outline: none;
+    }
+
+    .api-input:focus {
+      border-color: var(--forest-700);
+    }
+
+    .modal-note {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
+    .modal-info-box {
+      background: var(--sage-50);
+      border: 1px solid #cce3d0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: var(--forest-900);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-secondary {
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border-soft);
+      background: var(--cream-100);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      min-height: 40px;
+      padding: 8px 16px;
+      border-radius: 10px;
+      border: none;
+      background: var(--forest-900);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    /* ================= RESPONSIVE MOBILE ================= */
+    @media (max-width: 900px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .menu-btn,
+      .close-sidebar-btn {
+        display: inline-flex;
+      }
+
+      .desktop-only {
+        display: none !important;
+      }
+
+      .mobile-mode-bar {
+        display: flex;
+      }
+
+      .chat-viewport {
+        padding: 14px 12px;
+      }
+
+      .msg-content-col {
+        max-width: 90%;
+      }
+
+      .welcome-card {
+        padding: 18px 16px;
+      }
+
+      .composer-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- Backdrop Sidebar Mobile -->
+    <div id="sidebarBackdrop" class="sidebar-backdrop"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="sidebar" aria-label="Menu Materi Biologi">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <!-- Ikon Daun & Fauna SVG -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/>
+              <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+            </svg>
+          </div>
+          <div>
+            <div class="brand-title">BioFloraFauna</div>
+            <div class="brand-sub">Tutor & Ensiklopedia Biologi</div>
+          </div>
+        </div>
+        <button id="closeSidebarBtn" class="close-sidebar-btn" aria-label="Tutup Menu">✕</button>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="newChatSidebarBtn" class="btn-new-chat">
+          <span>🌿</span> Mulai Percakapan Baru
+        </button>
+      </div>
+
+      <div class="sidebar-scroll">
+        <div class="sidebar-section-label">5 Pilar Materi Biologi</div>
+
+        <button class="topic-group-btn" data-prompt="Jelaskan perbedaan struktur sel tumbuhan dan sel hewan lengkap dengan tabel organel serta fungsi pentingnya.">
+          <span class="topic-emoji">🔬</span>
+          <span>
+            <span class="topic-title">Struktur Sel & Metabolisme</span>
+            <span class="topic-desc">Sel tumbuhan vs hewan, organel, enzim, respirasi & fotosintesis</span>
+          </span>
+        </button>
+
+        <button class="topic-group-btn" data-prompt="Jelaskan sistem transportasi air dan nutrisi pada tumbuhan melalui xilem dan floem, serta peran transpirasi.">
+          <span class="topic-emoji">🌱</span>
+          <span>
+            <span class="topic-title">Botani (Tumbuhan)</span>
+            <span class="topic-desc">Jaringan, organ, xilem-floem, hormon, lumut hingga Angiospermae</span>
+          </span>
+        </button>
+
+        <button class="topic-group-btn" data-prompt="Bandingkan sistem peredaran darah pada berbagai kelompok hewan vertebrata (ikan, amfibi, reptil, burung, mamalia).">
+          <span class="topic-emoji">🦋</span>
+          <span>
+            <span class="topic-title">Zoologi & Fisiologi Hewan</span>
+            <span class="topic-desc">Invertebrata, vertebrata, sirkulasi, pernapasan, saraf & endokrin</span>
+          </span>
+        </button>
+
+        <button class="topic-group-btn" data-prompt="Jelaskan hubungan DNA, RNA, sintesis protein, serta perbedaan pembelahan sel mitosis dan meiosis.">
+          <span class="topic-emoji">🧬</span>
+          <span>
+            <span class="topic-title">Genetika, Molekuler & Evolusi</span>
+            <span class="topic-desc">DNA/RNA, hukum Mendel, mutasi, bioteknologi & evolusi</span>
+          </span>
+        </button>
+
+        <button class="topic-group-btn" data-prompt="Jelaskan aliran energi dalam rantai makanan, piramida ekologi, serta pentingnya konservasi flora dan fauna endemik Indonesia.">
+          <span class="topic-emoji">🌍</span>
+          <span>
+            <span class="topic-title">Ekologi & Biodiversitas</span>
+            <span class="topic-desc">Jaring makanan, daur biogeokimia, bioma & konservasi hayati</span>
+          </span>
+        </button>
+
+        <div class="sidebar-section-label">Eksplorasi Interaktif</div>
+        <button class="topic-group-btn" data-prompt="Berikan 3 soal kuis biologi bertahap tentang botani dan zoologi (pilihan ganda). Tunggu jawaban saya dulu sebelum membahas kunci jawabannya!">
+          <span class="topic-emoji">📝</span>
+          <span>
+            <span class="topic-title">Tantangan Kuis Biologi</span>
+            <span class="topic-desc">Uji pemahaman dengan soal interaktif flora & fauna</span>
+          </span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="model-badge-box">
+          <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+            <span id="modelStatusDot" class="status-dot"></span>
+            <span id="activeModelLabel" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">gemini-4-hydrogen</span>
+          </div>
+          <span style="opacity:0.75;font-size:0.68rem;">Aktif</span>
+        </div>
+
+        <button id="openSettingsSidebarBtn" class="btn-settings">
+          ⚙️ Pengaturan API Key
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CHAT WORKSPACE -->
+    <main class="main-area">
+      <!-- Top Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="openMenuBtn" class="menu-btn" aria-label="Buka Menu Materi">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg>
+          </button>
+          <div class="topbar-title-group">
+            <div class="topbar-title">BioFloraFauna</div>
+            <div class="topbar-subtitle">Asisten Biologi Lengkap • Fokus Tumbuhan & Hewan</div>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Mode Belajar Desktop -->
+          <div class="mode-selector desktop-only" role="group" aria-label="Mode Belajar">
+            <button class="mode-btn" data-mode="ringkas">Ringkas</button>
+            <button class="mode-btn active" data-mode="lengkap">Penjelasan Lengkap</button>
+            <button class="mode-btn" data-mode="latihan">Latihan Soal</button>
+          </div>
+
+          <button id="clearChatBtn" class="icon-action-btn" title="Hapus & Mulai Percakapan Baru" aria-label="Percakapan Baru">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18"/>
+              <path d="M8 6V4h8v2"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+            </svg>
+          </button>
+
+          <button id="openSettingsTopBtn" class="icon-action-btn" title="Pengaturan API Key" aria-label="Pengaturan API Key">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9c.26.604.852.997 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Mode Belajar Mobile -->
+      <div class="mobile-mode-bar">
+        <span class="mobile-mode-label">Mode:</span>
+        <div class="mode-selector" role="group" aria-label="Mode Belajar Mobile">
+          <button class="mode-btn" data-mode="ringkas">Ringkas</button>
+          <button class="mode-btn active" data-mode="lengkap">Lengkap</button>
+          <button class="mode-btn" data-mode="latihan">Latihan</button>
+        </div>
+      </div>
+
+      <!-- Chat Messages Viewport -->
+      <div id="chatViewport" class="chat-viewport">
+        <div id="chatContainer" class="chat-container">
+          <!-- Welcome Card dirender oleh JS -->
+        </div>
+      </div>
+
+      <!-- Composer / Input Area -->
+      <footer class="composer-shell">
+        <div class="composer-inner">
+          <div class="quick-strip" aria-label="Topik Cepat">
+            <button class="strip-chip" data-topic="Fotosintesis">☀️ Fotosintesis</button>
+            <button class="strip-chip" data-topic="Sel Tumbuhan vs Hewan">🔬 Sel Tumbuhan vs Hewan</button>
+            <button class="strip-chip" data-topic="Sistem Peredaran Darah Hewan">❤️ Peredaran Darah Hewan</button>
+            <button class="strip-chip" data-topic="Taksonomi & Klasifikasi">🏷️ Taksonomi & Klasifikasi</button>
+            <button class="strip-chip" data-topic="Genetika & DNA">🧬 Genetika & DNA</button>
+            <button class="strip-chip" data-topic="Ekologi & Bioma">🌳 Ekologi & Bioma</button>
+            <button class="strip-chip" data-topic="Kuis Biologi">📝 Kuis Biologi</button>
+          </div>
+
+          <form id="chatForm" class="input-box">
+            <textarea
+              id="chatInput"
+              rows="1"
+              placeholder="Tanyakan materi biologi tumbuhan, hewan, sel, genetika, atau ekologi..."
+              aria-label="Tulis pertanyaan biologi"
+            ></textarea>
+            <button id="sendBtn" type="submit" class="send-btn" aria-label="Kirim pertanyaan">
+              <svg id="sendIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
+              <svg id="stopIcon" style="display:none;" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="6" y="6" width="12" height="12" rx="2"/>
+              </svg>
+            </button>
+          </form>
+          <div class="composer-hint">
+            Tekan <strong>Enter</strong> untuk kirim • <strong>Shift + Enter</strong> untuk baris baru • Model utama: <code>gemini-4-hydrogen</code> (fallback <code>gemini-3.5-flash-lite</code>)
+          </div>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- MODAL PENGATURAN API KEY -->
+  <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h2 id="settingsModalTitle">⚙️ Pengaturan BioFloraFauna</h2>
+        <button id="closeSettingsBtn" class="modal-close" aria-label="Tutup">✕</button>
+      </div>
+
+      <label class="form-label" for="apiKeyInput">Google Gemini API Key</label>
+      <div class="api-input-row">
+        <input id="apiKeyInput" type="password" class="api-input" placeholder="Masukkan API Key Gemini..." autocomplete="off" />
+        <button id="toggleKeyVisBtn" type="button" class="btn-secondary">Lihat</button>
+      </div>
+      <p class="modal-note">
+        API key disimpan di peramban Anda (<code>localStorage</code>) untuk sesi berikutnya. Kosongkan atau klik reset untuk kembali ke konfigurasi awal.
+      </p>
+
+      <div class="modal-info-box">
+        <strong>Konfigurasi Model SDK <code>@google/genai</code>:</strong><br/>
+        • Model Utama: <code>gemini-4-hydrogen</code><br/>
+        • Fallback Otomatis: <code>gemini-3.5-flash-lite</code> (aktif otomatis bila model utama gangguan atau batas kuota tercapai)
+      </div>
+
+      <div class="modal-actions">
+        <button id="resetKeyBtn" type="button" class="btn-secondary">Reset Default</button>
+        <button id="saveKeyBtn" type="button" class="btn-primary">Simpan Pengaturan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT UTAMA: @google/genai + Logika Chatbot -->
+  <script type="module">
+    import { GoogleGenAI } from 'https://esm.sh/@google/genai';
+
+    // ================== KONFIGURASI AWAL ==================
+    const DEFAULT_API_KEY = 'AQ.Ab8RN6ILLM6L-QePKIiKYWTrjN0D5eUzpFjK4XFW7EMAm2EKTQ';
+    const PRIMARY_MODEL = 'gemini-4-hydrogen';
+    const FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+    const STORAGE_KEY = 'bioflorafauna_api_key';
+
+    // Mapping prompt untuk Quick Chips
+    const QUICK_TOPIC_PROMPTS = {
+      'Fotosintesis': 'Jelaskan proses fotosintesis pada tumbuhan secara runtut, mulai dari reaksi terang di tilakoid hingga reaksi gelap (siklus Calvin) di stroma, lengkap dengan analogi sederhana.',
+      'Sel Tumbuhan vs Hewan': 'Bandingkan struktur sel tumbuhan dan sel hewan secara jelas menggunakan tabel perbandingan organel serta ringkasan poin pentingnya.',
+      'Sistem Peredaran Darah Hewan': 'Jelaskan sistem peredaran darah terbuka dan tertutup pada hewan, serta bandingkan ruang jantung pada pisces, amfibi, reptil, aves, dan mamalia.',
+      'Taksonomi & Klasifikasi': 'Jelaskan urutan taksonomi makhluk hidup serta aturan penulisan tata nama ganda (binomial nomenclature) beserta contoh nama ilmiah tumbuhan dan hewan Indonesia.',
+      'Genetika & DNA': 'Jelaskan struktur DNA dan RNA, bagaimana sintesis protein berlangsung, serta hukum pewarisan sifat Mendel dengan contoh sederhana.',
+      'Ekologi & Bioma': 'Jelaskan perbedaan rantai makanan, jaring-jaring makanan, piramida ekologi, serta jenis-jenis bioma utama di bumi beserta flora dan faunanya.',
+      'Kuis Biologi': 'Buatkan 3 soal latihan kuis biologi interaktif (tingkat menengah) seputar tumbuhan, hewan, dan sel. Berikan pilihan A-D dan ajak saya menjawab dulu sebelum menampilkan pembahasannya!'
+    };
+
+    // State Aplikasi
+    let apiKey = localStorage.getItem(STORAGE_KEY) || DEFAULT_API_KEY;
+    let learningMode = 'lengkap'; // 'ringkas' | 'lengkap' | 'latihan'
+    let conversationHistory = []; // Array of { role: 'user' | 'model', parts: [{ text }] }
+    let isGenerating = false;
+    let activeAbortController = null;
+    let lastFailedUserPrompt = null;
+
+    // Elemen DOM
+    const sidebar = document.getElementById('sidebar');
+    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    const openMenuBtn = document.getElementById('openMenuBtn');
+    const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+    const chatViewport = document.getElementById('chatViewport');
+    const chatContainer = document.getElementById('chatContainer');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const sendIcon = document.getElementById('sendIcon');
+    const stopIcon = document.getElementById('stopIcon');
+    const activeModelLabel = document.getElementById('activeModelLabel');
+    const modelStatusDot = document.getElementById('modelStatusDot');
+
+    // Modal Pengaturan
+    const settingsModal = document.getElementById('settingsModal');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    const toggleKeyVisBtn = document.getElementById('toggleKeyVisBtn');
+    const saveKeyBtn = document.getElementById('saveKeyBtn');
+    const resetKeyBtn = document.getElementById('resetKeyBtn');
+    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+
+    // Konfigurasi Marked.js
+    if (window.marked) {
+      marked.setOptions({
+        breaks: true,
+        gfm: true
+      });
+    }
+
+    // ================== SYSTEM INSTRUCTION DINAMIS ==================
+    function buildSystemInstruction(mode) {
+      const modeInstructions = {
+        ringkas: `GAYA JAWABAN SAAT INI: MODE RINGKAS.
+- Berikan jawaban yang padat, langsung pada inti konsep, dan nyaman dibaca cepat di layar HP.
+- Gunakan poin-poin singkat (bullet points) dan maksimal 1 paragraf pengantar singkat.
+- Tetap sertakan nama ilmiah dengan cetak miring dan 1 ringkasan kunci di akhir.`,
+        lengkap: `GAYA JAWABAN SAAT INI: MODE PENJELASAN LENGKAP.
+- Berikan penjelasan mendalam, runtut dari konsep dasar hingga mekanisme ilmiahnya, seperti tutor & ensiklopedia biologi profesional.
+- Sertakan analogi sederhana yang mudah dibayangkan siswa/mahasiswa, tabel perbandingan bila relevan, ringkasan poin penting, dan tawarkan opsi latihan soal di akhir.`,
+        latihan: `GAYA JAWABAN SAAT INI: MODE LATIHAN SOAL & KUIS.
+- Jika pengguna meminta materi atau kuis, buatlah pertanyaan latihan (pilihan ganda atau esai singkat) yang menguji pemahaman konsep biologi tumbuhan/hewan.
+- Jika pengguna baru saja menjawab soal sebelumnya, koreksi jawabannya dengan ramah, jelaskan mengapa benar/salah, lalu tawarkan soal berikutnya.
+- Jika pengguna meminta penjelasan suatu topik dalam mode ini, berikan ringkasan konsep singkat lalu akhiri dengan 1-2 soal latihan untuk dikerjakan.`
+      };
+
+      return `Kamu adalah **BioFloraFauna**, tutor sekaligus ensiklopedia Biologi interaktif berbahasa Indonesia yang ramah, akurat, terstruktur, dan ahli dalam ilmu kehidupan dari tingkat dasar hingga lanjutan, dengan fokus utama pada **Tumbuhan (Botani)** dan **Hewan (Zoologi)**.
+
+CAKUPAN KEAHLIAN BIOLOGI LENGKAP:
+1. **Struktur Sel & Metabolisme:** perbandingan sel tumbuhan vs sel hewan, organel (kloroplas, mitokondria, vakuola, dinding sel, lisosom, sentriol), transport membran (difusi, osmosis, transpor aktif), enzim, respirasi seluler (glikolisis, siklus Krebs, transpor elektron), serta fotosintesis (reaksi terang & siklus Calvin/reaksi gelap).
+2. **Botani (Tumbuhan):** jaringan meristem & dewasa, organ tumbuhan (akar, batang, daun, bunga, buah, biji), transportasi air & nutrisi (xilem, floem, transpirasi, kohesi-adhesi), hormon tumbuhan (auksin, giberelin, sitokinin, etilen, asam absisat), serta klasifikasi tumbuhan (Bryophyta/lumut, Pteridophyta/paku, Gymnospermae, Angiospermae: monokotil & dikotil).
+3. **Zoologi & Fisiologi Hewan:** klasifikasi invertebrata (Porifera hingga Arthropoda & Echinodermata) dan vertebrata (Pisces, Amphibia, Reptilia, Aves, Mammalia), sistem pencernaan, pernapasan (insang, trakea, paru-paru, pundi-pundi udara), peredaran darah (terbuka vs tertutup, tunggal vs ganda), saraf, endokrin/hormon, ekskresi, gerak, dan reproduksi hewan.
+4. **Genetika, Molekuler & Evolusi:** struktur DNA & RNA, replikasi, sintesis protein (transkripsi & translasi), pembelahan sel (mitosis & meiosis), pewarisan sifat (hukum Mendel I & II, penyimpangan semu), mutasi, bioteknologi konvensional & modern, serta teori evolusi & seleksi alam.
+5. **Ekologi & Keanekaragaman Hayati:** rantai & jaring makanan, piramida ekologi, daur biogeokimia (karbon, nitrogen, air, fosfor), bioma dunia & Indonesia, interaksi organisme (simbiosis, kompetisi, predasi), serta konservasi flora-fauna langka/endemik.
+
+ATURAN PENULISAN & PEDAGOGI:
+- Selalu tulis **nama ilmiah** (binomial nomenclature) dengan format *cetak miring* sesuai kaidah (huruf pertama genus kapital, epitet spesifik huruf kecil), contoh: *Oryza sativa*, *Panthera tigris*, *Rafflesia arnoldii*, *Komodoensis* / *Varanus komodoensis*.
+- Gunakan format Markdown yang rapi (judul bagian, poin-poin, **kata kunci tebal**, dan tabel perbandingan jika membandingkan dua konsep).
+- Sertakan **analogi sederhana** agar konsep abstrak mudah dipahami dan akhiri atau selipkan **ringkasan poin penting** bila sesuai.
+- Jika pengguna bertanya di luar topik biologi (misalnya matematika murni, politik, pemrograman umum, gosip), tolak dengan sangat ramah dan arahkan kembali ke topik biologi—khususnya tentang tumbuhan, hewan, sel, atau proses kehidupan di alam.
+
+${modeInstructions[mode] || modeInstructions.lengkap}`;
+    }
+
+    // ================== RENDER & UTILITAS UI ==================
+    function renderMarkdown(rawText) {
+      if (!window.marked || !window.DOMPurify) {
+        return rawText.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+      }
+      const html = marked.parse(rawText);
+      const cleanHtml = DOMPurify.sanitize(html);
+      // Bungkus tabel agar responsif di layar HP
+      const temp = document.createElement('div');
+      temp.innerHTML = cleanHtml;
+      temp.querySelectorAll('table').forEach((tbl) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-scroll';
+        tbl.parentNode.insertBefore(wrapper, tbl);
+        wrapper.appendChild(tbl);
+      });
+      return temp.innerHTML;
+    }
+
+    function scrollToBottom() {
+      chatViewport.scrollTop = chatViewport.scrollHeight;
+    }
+
+    function setModelBadge(modelName, isFallback = false) {
+      activeModelLabel.textContent = modelName;
+      if (isFallback) {
+        modelStatusDot.classList.add('fallback');
+      } else {
+        modelStatusDot.classList.remove('fallback');
+      }
+    }
+
+    function renderWelcomeCard() {
+      chatContainer.innerHTML = `
+        <section class="welcome-card" aria-label="Sambutan BioFloraFauna">
+          <svg class="welcome-deco" width="160" height="160" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66l.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8Z"/>
+          </svg>
+          <div class="welcome-badge">🌿 Ensiklopedia & Tutor Biologi Interaktif</div>
+          <h1>Selamat datang di BioFloraFauna!</h1>
+          <p>
+            Jelajahi keajaiban dunia <strong>tumbuhan</strong>, <strong>hewan</strong>, hingga mekanisme kehidupan tingkat sel dan ekosistem. Pilih topik cepat di bawah atau ketik pertanyaan biologimu sendiri.
+          </p>
+
+          <div class="pillars-grid">
+            <div class="pillar-item">
+              <strong>🔬 Sel & Metabolisme</strong>
+              <span>Organel, enzim, respirasi sel & fotosintesis</span>
+            </div>
+            <div class="pillar-item">
+              <strong>🌱 Botani Tumbuhan</strong>
+              <span>Jaringan, xilem-floem, hormon & klasifikasi</span>
+            </div>
+            <div class="pillar-item">
+              <strong>🦋 Zoologi Hewan</strong>
+              <span>Anatomi, fisiologi organ & vertebrata-invertebrata</span>
+            </div>
+            <div class="pillar-item">
+              <strong>🧬 Genetika & Ekologi</strong>
+              <span>DNA, Mendel, evolusi, bioma & konservasi</span>
+            </div>
+          </div>
+
+          <div class="quick-chips-wrap">
+            ${Object.keys(QUICK_TOPIC_PROMPTS).map(topic => `
+              <button class="quick-chip" data-topic="${topic}">${getTopicIcon(topic)} ${topic}</button>
+            `).join('')}
+          </div>
+        </section>
+      `;
+
+      chatContainer.querySelectorAll('.quick-chip').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const topic = btn.getAttribute('data-topic');
+          sendPrompt(QUICK_TOPIC_PROMPTS[topic] || topic);
+        });
+      });
+    }
+
+    function getTopicIcon(topic) {
+      const icons = {
+        'Fotosintesis': '☀️',
+        'Sel Tumbuhan vs Hewan': '🔬',
+        'Sistem Peredaran Darah Hewan': '❤️',
+        'Taksonomi & Klasifikasi': '🏷️',
+        'Genetika & DNA': '🧬',
+        'Ekologi & Bioma': '🌳',
+        'Kuis Biologi': '📝'
+      };
+      return icons[topic] || '🌿';
+    }
+
+    function appendUserMessage(text) {
+      const row = document.createElement('div');
+      row.className = 'msg-row user';
+      row.innerHTML = `
+        <div class="msg-avatar" aria-hidden="true">🧑</div>
+        <div class="msg-content-col">
+          <div class="msg-bubble"></div>
+        </div>
+      `;
+      row.querySelector('.msg-bubble').textContent = text;
+      chatContainer.appendChild(row);
+      scrollToBottom();
+    }
+
+    function createAssistantMessageShell() {
+      const row = document.createElement('div');
+      row.className = 'msg-row assistant';
+      row.innerHTML = `
+        <div class="msg-avatar" aria-hidden="true">🌿</div>
+        <div class="msg-content-col">
+          <div class="msg-bubble markdown-body">
+            <div class="thinking-indicator">
+              <div class="leaf-dots"><span></span><span></span><span></span></div>
+              <span>Sedang berpikir & menelaah referensi biologi...</span>
+            </div>
+          </div>
+          <div class="msg-meta" style="display:none;"></div>
+        </div>
+      `;
+      chatContainer.appendChild(row);
+      scrollToBottom();
+      return {
+        row,
+        bubble: row.querySelector('.msg-bubble'),
+        meta: row.querySelector('.msg-meta')
+      };
+    }
+
+    function finalizeAssistantMeta(metaEl, rawText, modelUsed, isFallback) {
+      metaEl.style.display = 'flex';
+      metaEl.innerHTML = `
+        <button type="button" class="copy-btn" aria-label="Salin jawaban">
+          📋 Salin Jawaban
+        </button>
+        ${isFallback ? `<span class="fallback-pill">Model cadangan: ${modelUsed}</span>` : `<span>Model: ${modelUsed}</span>`}
+      `;
+
+      const copyBtn = metaEl.querySelector('.copy-btn');
+      copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(rawText);
+          copyBtn.textContent = '✅ Tersalin!';
+          setTimeout(() => {
+            copyBtn.innerHTML = '📋 Salin Jawaban';
+          }, 1800);
+        } catch {
+          copyBtn.textContent = '⚠️ Gagal menyalin';
+        }
+      });
+    }
+
+    // ================== PENANGANAN ERROR RAMAH ==================
+    function formatFriendlyError(err) {
+      const msg = (err && (err.message || err.toString())) || 'Terjadi kesalahan yang tidak diketahui.';
+      const lower = msg.toLowerCase();
+
+      if (!navigator.onLine || lower.includes('failed to fetch') || lower.includes('network')) {
+        return {
+          title: 'Koneksi Jaringan Bermasalah',
+          detail: 'Pastikan perangkat Anda terhubung ke internet, lalu coba kirim ulang pertanyaan Anda.',
+          canRetry: true
+        };
+      }
+      if (lower.includes('api_key') || lower.includes('api key') || lower.includes('401') || lower.includes('403') || lower.includes('permission') || lower.includes('unauthenticated')) {
+        return {
+          title: 'API Key Tidak Valid atau Kedaluwarsa',
+          detail: 'Periksa kembali Google Gemini API key pada menu Pengaturan (ikon ⚙️) di pojok kanan atas atau sidebar.',
+          canRetry: false,
+          suggestSettings: true
+        };
+      }
+      if (lower.includes('429') || lower.includes('quota') || lower.includes('rate') || lower.includes('resource_exhausted')) {
+        return {
+          title: 'Kuota / Batas Permintaan Tercapai',
+          detail: 'Permintaan ke Gemini API sedang padat atau batas kuota sementara terpenuhi. Tunggu beberapa saat lalu coba lagi.',
+          canRetry: true
+        };
+      }
+      return {
+        title: 'Gagal Memuat Jawaban Biologi',
+        detail: `Detail teknis: ${msg}`,
+        canRetry: true
+      };
+    }
+
+    function renderErrorInShell(bubbleEl, err) {
+      const info = formatFriendlyError(err);
+      bubbleEl.innerHTML = `
+        <div class="error-card">
+          <strong>⚠️ ${info.title}</strong><br/>
+          <span>${info.detail}</span>
+          <div class="error-actions">
+            ${info.canRetry ? '<button type="button" class="btn-err retry-btn">🔄 Coba Lagi</button>' : ''}
+            <button type="button" class="btn-err open-settings-err-btn">⚙️ Atur API Key</button>
+          </div>
+        </div>
+      `;
+
+      const retryBtn = bubbleEl.querySelector('.retry-btn');
+      if (retryBtn && lastFailedUserPrompt) {
+        retryBtn.addEventListener('click', () => {
+          bubbleEl.closest('.msg-row').remove();
+          sendPrompt(lastFailedUserPrompt, true);
+        });
+      }
+
+      bubbleEl.querySelector('.open-settings-err-btn').addEventListener('click', openSettingsModal);
+    }
+
+    // ================== KOMUNIKASI GEMINI API (@google/genai) ==================
+    async function streamFromModel(ai, modelName, contents, abortSignal, onChunk) {
+      const responseStream = await ai.models.generateContentStream({
+        model: modelName,
+        contents,
+        config: {
+          systemInstruction: buildSystemInstruction(learningMode),
+          temperature: learningMode === 'latihan' ? 0.7 : 0.55,
+          abortSignal
+        }
+      });
+
+      let fullText = '';
+      for await (const chunk of responseStream) {
+        const piece = typeof chunk.text === 'function' ? chunk.text() : (chunk.text || '');
+        if (piece) {
+          fullText += piece;
+          onChunk(fullText);
+        }
+      }
+      return fullText;
+    }
+
+    function shouldTriggerFallback(err) {
+      if (!err) return false;
+      if (err.name === 'AbortError') return false;
+      const msg = (err.message || '').toLowerCase();
+      // Jika key memang ditolak (401/403), fallback model tetap memakai key sama jadi tidak perlu fallback kecuali bukan key error
+      const isHardAuthError = msg.includes('api key not valid') || msg.includes('unauthenticated');
+      return !isHardAuthError;
+    }
+
+    function setGeneratingState(active) {
+      isGenerating = active;
+      if (active) {
+        sendBtn.classList.add('stop-mode');
+        sendBtn.type = 'button';
+        sendBtn.setAttribute('aria-label', 'Hentikan jawaban');
+        sendIcon.style.display = 'none';
+        stopIcon.style.display = 'block';
+      } else {
+        sendBtn.classList.remove('stop-mode');
+        sendBtn.type = 'submit';
+        sendBtn.setAttribute('aria-label', 'Kirim pertanyaan');
+        sendIcon.style.display = 'block';
+        stopIcon.style.display = 'none';
+      }
+    }
+
+    async function sendPrompt(promptText, isRetry = false) {
+      const trimmed = (promptText || '').trim();
+      if (!trimmed || isGenerating) return;
+
+      // Hapus welcome card jika masih ada
+      const welcome = chatContainer.querySelector('.welcome-card');
+      if (welcome) welcome.remove();
+
+      if (!isRetry) {
+        appendUserMessage(trimmed);
+      }
+
+      lastFailedUserPrompt = trimmed;
+      chatInput.value = '';
+      autoResizeTextarea();
+      closeMobileSidebar();
+
+      const shell = createAssistantMessageShell();
+      activeAbortController = new AbortController();
+      setGeneratingState(true);
+
+      const pendingContents = [
+        ...conversationHistory,
+        { role: 'user', parts: [{ text: trimmed }] }
+      ];
+
+      let usedModel = PRIMARY_MODEL;
+      let isFallback = false;
+
+      try {
+        const ai = new GoogleGenAI({ apiKey: apiKey.trim() });
+        setModelBadge(PRIMARY_MODEL, false);
+
+        let accumulated = '';
+        try {
+          accumulated = await streamFromModel(
+            ai,
+            PRIMARY_MODEL,
+            pendingContents,
+            activeAbortController.signal,
+            (textSoFar) => {
+              shell.bubble.innerHTML = renderMarkdown(textSoFar);
+              scrollToBottom();
+            }
+          );
+        } catch (primaryErr) {
+          if (primaryErr.name === 'AbortError') throw primaryErr;
+
+          if (shouldTriggerFallback(primaryErr)) {
+            console.warn(`Primary model (${PRIMARY_MODEL}) gagal, fallback ke ${FALLBACK_MODEL}:`, primaryErr);
+            usedModel = FALLBACK_MODEL;
+            isFallback = true;
+            setModelBadge(FALLBACK_MODEL, true);
+
+            shell.bubble.innerHTML = `
+              <div class="thinking-indicator">
+                <div class="leaf-dots"><span></span><span></span><span></span></div>
+                <span>Beralih ke model cadangan <code>${FALLBACK_MODEL}</code>...</span>
+              </div>
+            `;
+
+            accumulated = await streamFromModel(
+              ai,
+              FALLBACK_MODEL,
+              pendingContents,
+              activeAbortController.signal,
+              (textSoFar) => {
+                shell.bubble.innerHTML = renderMarkdown(textSoFar);
+                scrollToBottom();
+              }
+            );
+          } else {
+            throw primaryErr;
+          }
+        }
+
+        if (!accumulated.trim()) {
+          throw new Error('Model tidak mengembalikan teks jawaban.');
+        }
+
+        // Simpan ke riwayat percakapan setelah sukses
+        conversationHistory.push(
+          { role: 'user', parts: [{ text: trimmed }] },
+          { role: 'model', parts: [{ text: accumulated }] }
+        );
+        lastFailedUserPrompt = null;
+        finalizeAssistantMeta(shell.meta, accumulated, usedModel, isFallback);
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          shell.bubble.innerHTML = '<em style="color:var(--text-muted);">⏹️ Pembuatan jawaban dihentikan oleh pengguna.</em>';
+        } else {
+          renderErrorInShell(shell.bubble, err);
+        }
+      } finally {
+        activeAbortController = null;
+        setGeneratingState(false);
+        scrollToBottom();
+      }
+    }
+
+    // ================== EVENT LISTENERS & NAVIGASI ==================
+    function autoResizeTextarea() {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 140) + 'px';
+    }
+
+    chatInput.addEventListener('input', autoResizeTextarea);
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (!isGenerating) {
+          sendPrompt(chatInput.value);
+        }
+      }
+    });
+
+    chatForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!isGenerating) {
+        sendPrompt(chatInput.value);
+      }
+    });
+
+    sendBtn.addEventListener('click', (e) => {
+      if (isGenerating && activeAbortController) {
+        e.preventDefault();
+        activeAbortController.abort();
+      }
+    });
+
+    // Quick strip chips
+    document.querySelectorAll('.strip-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const topic = chip.getAttribute('data-topic');
+        sendPrompt(QUICK_TOPIC_PROMPTS[topic] || topic);
+      });
+    });
+
+    // Sidebar topic cards
+    document.querySelectorAll('.topic-group-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const prompt = btn.getAttribute('data-prompt');
+        sendPrompt(prompt);
+      });
+    });
+
+    // Mode Belajar Sync (Desktop & Mobile)
+    function setLearningMode(mode) {
+      learningMode = mode;
+      document.querySelectorAll('.mode-btn').forEach((btn) => {
+        btn.classList.toggle('active', btn.getAttribute('data-mode') === mode);
+      });
+    }
+
+    document.querySelectorAll('.mode-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setLearningMode(btn.getAttribute('data-mode'));
+      });
+    });
+
+    // Reset Percakapan Baru
+    function resetConversation() {
+      if (isGenerating && activeAbortController) {
+        activeAbortController.abort();
+      }
+      conversationHistory = [];
+      lastFailedUserPrompt = null;
+      setModelBadge(PRIMARY_MODEL, false);
+      renderWelcomeCard();
+      closeMobileSidebar();
+      chatInput.focus();
+    }
+
+    document.getElementById('clearChatBtn').addEventListener('click', resetConversation);
+    document.getElementById('newChatSidebarBtn').addEventListener('click', resetConversation);
+
+    // Sidebar Mobile Drawer
+    function openMobileSidebar() {
+      sidebar.classList.add('open');
+      sidebarBackdrop.classList.add('open');
+    }
+
+    function closeMobileSidebar() {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.remove('open');
+    }
+
+    openMenuBtn.addEventListener('click', openMobileSidebar);
+    closeSidebarBtn.addEventListener('click', closeMobileSidebar);
+    sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+    // Modal Pengaturan API Key
+    function openSettingsModal() {
+      apiKeyInput.value = apiKey;
+      apiKeyInput.type = 'password';
+      toggleKeyVisBtn.textContent = 'Lihat';
+      settingsModal.classList.add('open');
+      closeMobileSidebar();
+    }
+
+    function closeSettingsModal() {
+      settingsModal.classList.remove('open');
+    }
+
+    document.getElementById('openSettingsTopBtn').addEventListener('click', openSettingsModal);
+    document.getElementById('openSettingsSidebarBtn').addEventListener('click', openSettingsModal);
+    closeSettingsBtn.addEventListener('click', closeSettingsModal);
+    settingsModal.addEventListener('click', (e) => {
+      if (e.target === settingsModal) closeSettingsModal();
+    });
+
+    toggleKeyVisBtn.addEventListener('click', () => {
+      const isHidden = apiKeyInput.type === 'password';
+      apiKeyInput.type = isHidden ? 'text' : 'password';
+      toggleKeyVisBtn.textContent = isHidden ? 'Sembunyi' : 'Lihat';
+    });
+
+    saveKeyBtn.addEventListener('click', () => {
+      const newVal = apiKeyInput.value.trim();
+      if (newVal) {
+        apiKey = newVal;
+        localStorage.setItem(STORAGE_KEY, newVal);
+      } else {
+        apiKey = DEFAULT_API_KEY;
+        localStorage.removeItem(STORAGE_KEY);
+      }
+      closeSettingsModal();
+    });
+
+    resetKeyBtn.addEventListener('click', () => {
+      apiKey = DEFAULT_API_KEY;
+      apiKeyInput.value = DEFAULT_API_KEY;
+      localStorage.removeItem(STORAGE_KEY);
+    });
+
+    // Inisialisasi Awal
+    renderWelcomeCard();
+  </script>
+</body>
+</html>
